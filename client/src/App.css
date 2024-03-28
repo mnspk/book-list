@@ -24,6 +24,7 @@
   background-color: #cfb792;
   padding: 3px 8px;
   border: 0;
+  user-select: none;
 }
 
 .description {
