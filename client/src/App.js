@@ -1,26 +1,34 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import "./App.css";
 import axios from "axios";
 import Book from "./book";
 
 function App() {
-  const [data, setData] = React.useState();
-  const [bookName, setBookName] = React.useState();
-  const [hideButton, setHideButton] = React.useState(true);
-  //const [bookIndex, setBookIndex] = React.useState();
+  const [data, setData] = useState();
+  const [bookName, setBookName] = useState();
+  const [booleanValues, setBooleanValues] = useState();
+  
+  useEffect(() => {
+    async function fetchData(){
+      try {
+        const response = await axios.get("/api");
+        setData(response.data.message);
+      } catch (error) {
+        console.error(error)
+      }
+    };
+    fetchData();
+  }, []);
 
+  useEffect(() => { // prevents attempting to map data before data is set
+    if (data && data.length > 0){
+      setBooleanValues(data.map(data => data.booleanValue));
+    }
+  }, [data])
+  
   function handleChange(event){
     setBookName(event.target.value)
   }
-
-  React.useEffect(() => {
-    axios.get("/api").then((res) => {
-      setData(res.data.message);
-    });
-    //   fetch("/api")
-    //     .then((res) => res.json())
-    //     .then((data) => setData(data.message))
-  }, []);
 
   async function addBook(){
     await axios.post("/api", {bookName: bookName}).then((res) => {
@@ -28,26 +36,26 @@ function App() {
     })
   }
 
-  async function deleteBook(index){
-    await axios.post("/api/delete", {index}).then((res) => {
-      setData(res.data.message);
-    })
-  }
+  function handleDelete(index){
+      setData(data?.filter((_, i) => i !== index));
+      setBooleanValues(booleanValues.filter((_, i) => i !== index));
+    }
 
-  function mouseOn(index){
-    setHideButton(false);
-    //setBookIndex(index)
-  }
+  function handleCallback(index, status){ // updates data.booleanValue whenever delete button is clicked
+    const listBeforeIndex = data.slice(0,index);
+    const listAfterIndex = data.slice(index+1);
 
-  function mouseOff(index){
-    setHideButton(true);
-    //setBookIndex(index)
+    data[index].booleanValue = status; // update the booleanValue
+
+    setData([
+      ...listBeforeIndex, data[index], ...listAfterIndex
+    ])
   }
 
   return (
     <div className="App">
       <div className="beige-nav">
-        <h1>Book List</h1>
+        <h1>Title</h1>
       </div>
       <div style={{padding: "20px"}}>
         <button onClick={addBook}>Add Book</button>
@@ -58,16 +66,13 @@ function App() {
           <Book 
           key={index} 
           index={index} 
-          bookInfo={bookInfo} // JS object with {title, authors, image}
-          deleteBook={deleteBook}
-          mouseOn={mouseOn}
-          mouseOff={mouseOff}
-          hideButton={hideButton}
-          //bookIndex={bookIndex}
+          bookInfo={bookInfo} // JS object with {title, authors, image, description}
+          onDelete={() => handleDelete(index)}
+          handleCallback={handleCallback}
+          initialShowDesc={bookInfo.booleanValue}
           />
         ))}
       </div>
-      {/* {!data ? "Loading..." : data} */}
     </div>
   );
 }

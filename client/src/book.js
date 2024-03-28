@@ -1,12 +1,19 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 
 export default function Book(props) {
   const { title, authors, image, description } = props.bookInfo;
-  const [showDesc, setShowDesc] = React.useState(false);
-  const [showButton, setShowButton] = React.useState(false);
+  const [showDesc, setShowDesc] = useState(props.initialShowDesc);
+  const [showButton, setShowButton] = useState(false);
 
-  function toggleDescription() {
-    setShowDesc(!showDesc);
+  useEffect(() => {
+    setShowDesc(props.initialShowDesc);
+  }, [props.initialShowDesc]);
+
+  function toggleDescription(event) {
+    if (event.target.value !== "Remove"){
+      setShowDesc(!showDesc);
+      props.handleCallback(props.index, !showDesc) // !showDesc since sync function
+    }
   }
 
   function mouseOn() {
@@ -17,10 +24,15 @@ export default function Book(props) {
     setShowButton(false);
   }
 
+  function handleDelete() {
+    props.onDelete(props.index)
+  }
+
   return (
     <div
       className="book-cover"
-      onClick={toggleDescription}
+      style={{cursor: 'pointer'}}
+      onClick={toggleDescription} 
       onMouseEnter={mouseOn}
       onMouseLeave={mouseOff}
     >
@@ -30,8 +42,9 @@ export default function Book(props) {
       <div style={{ opacity: showDesc ? "0.1" : "1" }}>
         <div style={{ paddingBottom: "10px" }}>
           <button
-            style={{ visibility: (!showButton || showDesc) ? "hidden" : null }}
-            onClick={() => props.deleteBook(props.index)}
+            style={{ visibility: (!showButton || showDesc) ? "hidden" : null , cursor: 'pointer'}}
+            onClick={handleDelete}
+            value={"Remove"}
           >
             Remove
           </button>
@@ -41,7 +54,7 @@ export default function Book(props) {
         </div>
         <div className="bookInfo-text">
           <p style={{ fontWeight: "bold" }}>{title}</p>
-          <p>{authors.join(", ")}</p>
+          <p>{authors ? authors.join(", ") : null}</p>
         </div>
       </div>
     </div>
