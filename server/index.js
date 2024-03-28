@@ -17,29 +17,6 @@ let bookNameList = [
 ];
 
 let bookInfo;
-// let bookInfo = [
-//   {
-//     title: "animal farm",
-//     authors: [ 'George Orwell' ],
-//     image: "http://books.google.com/books/content?id=yDQJ6y2LSX8C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
-//   },
-//   {
-//     title: "Harry Potter and the Half-Blood Prince",
-//     authors: [ 'J.K. Rowling' ],
-//     image: "http://books.google.com/books/content?id=R7YsowJI9-IC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
-//   },
-//   {
-//     title: "Demian",
-//     authors: [ 'Hermann Hesse' ],
-//     image: "http://books.google.com/books/content?id=Uf4GdPn5EiEC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
-//   },
-//   {
-//     title: "Harry Potter and the Chamber of Secrets",
-//     authors: [ 'J.K. Rowling' ],
-//     image: "http://books.google.com/books/content?id=5iTebBW-w7QC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
-//   },
-// ]
-// will be replaced with postgres
 
 async function returnsBookInfo() {
   bookInfo = [];
@@ -47,26 +24,31 @@ async function returnsBookInfo() {
     const response = await axios.get(
       `https://www.googleapis.com/books/v1/volumes?q=${name}`
     );
+
+    // const results = response.data.items;
+    // let result;
+    // for(let i = 0; i < 5; i++){
+    //   if(results[i].volumeInfo.imageLinks){
+    //     result = results[i].volumeInfo.imageLinks
+    //     break;
+    //   }
+    // }
     const result = response.data.items[0].volumeInfo;
 
     const {imageLinks, title, authors, description} = result; //title: string // authors: array
     const image = imageLinks.thumbnail;
-    bookInfo.push({title, authors, image, description})
-    // bookInfo[index] = result;
+    const booleanValue = false;
 
-    return {title, authors, image, description};
+    //bookInfo.push({title, authors, image, description})
+    bookInfo[index] = {title, authors, image, description, booleanValue};
+
+    return {title, authors, image, description, booleanValue};
   });
-
   // to make the function wait for .map to execute completely before returning
   const updatedBookInfo = Promise.all(promises).then((result) => {
     return result;
   });
   return updatedBookInfo;
-}
-
-async function filtersURLList(index) {
-  bookInfo.splice(index, 1);
-  return bookInfo;
 }
 
 app.get("/api", async (req, res) => {
@@ -81,12 +63,6 @@ app.post("/api", async (req, res) => {
   data ? bookNameList.push(data) : null; //******** should be changed to SQL code INSERT INTO
 
   const result = await returnsBookInfo();
-  res.send({ message: result });
-});
-
-app.post("/api/delete", async (req, res) => {
-  const index = req.body.index;
-  const result = await filtersURLList(index);
   res.send({ message: result });
 });
 
