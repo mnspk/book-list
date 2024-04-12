@@ -1,8 +1,31 @@
-.beige-nav {
+.title-nav {
   display: flex;
   background: #cfb792;
   color: #333333;
   padding-left: 20px;
+}
+
+.tabs {
+  overflow: hidden;
+  background: #eeb;
+  padding: 12px;
+  border: 1px solid #ccc;
+}
+
+.tabs button {
+  background-color: inherit;
+  float: left;
+  margin: 0px 5px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+
+}
+
+.tabs button:hover {
+  background-color: #909040;
 }
 
 .book-boxes {
