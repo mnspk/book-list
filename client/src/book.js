@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 
 export default function Book(props) {
-  const { title, authors, image, description } = props.bookInfo;
+  const { title, authors, image, description, id} = props.bookInfo;
   const [showDesc, setShowDesc] = useState(props.initialShowDesc);
   const [showButton, setShowButton] = useState(false);
 
@@ -12,7 +12,7 @@ export default function Book(props) {
   function toggleDescription(event) {
     if (event.target.value !== "Remove"){
       setShowDesc(!showDesc);
-      props.handleCallback(props.index, !showDesc) // !showDesc since sync function
+      props.handleCallback(props.index, !showDesc)
     }
   }
 
@@ -25,7 +25,7 @@ export default function Book(props) {
   }
 
   function handleDelete() {
-    props.onDelete(props.index)
+    props.onDelete(props.index, id)
   }
 
   return (
